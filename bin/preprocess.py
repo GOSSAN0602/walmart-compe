@@ -20,18 +20,18 @@ from sklearn.preprocessing import LabelEncoder
 # Read Data
 INPUT_DIR = "../input/m5-forecasting-accuracy"
 print("Reading files...")
-calendar = pd.read_csv(f"{INPUT_DIR}/calendar.csv")
-prices = pd.read_csv(f"{INPUT_DIR}/sell_prices.csv")
-sales = pd.read_csv(f"{INPUT_DIR}/sales_train_validation.csv",)
-submission = pd.read_csv(f"{INPUT_DIR}/sample_submission.csv")
+calendar = pd.read_csv(f"{INPUT_DIR}/calendar.csv").pipe(reduce_mem_usage)
+prices = pd.read_csv(f"{INPUT_DIR}/sell_prices.csv").pipe(reduce_mem_usage)
+sales = pd.read_csv(f"{INPUT_DIR}/sales_train_validation.csv",).pipe(reduce_mem_usage)
+submission = pd.read_csv(f"{INPUT_DIR}/sample_submission.csv").pipe(reduce_mem_usage)
 
 NUM_ITEMS = sales.shape[0]
 DAYS_PRED = submission.shape[1] - 1
 
 # Encode Categorical
-calendar = encode_categorical(calendar, ["event_name_1", "event_type_1", "event_name_2", "event_type_2"])
-sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "state_id"],)
-prices = encode_categorical(prices, ["item_id", "store_id"])
+calendar = encode_categorical(calendar, ["event_name_1", "event_type_1", "event_name_2", "event_type_2"]).pipe(reduce_mem_usage)
+sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "state_id"],).pipe(reduce_mem_usage)
+prices = encode_categorical(prices, ["item_id", "store_id"]).pipe(reduce_mem_usage)
 
 # merge tables
 data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 365 * 3)
@@ -47,12 +47,13 @@ data = merge_prices(data, prices)
 del prices
 gc.collect()
 
+data = reduce_mem_usage(data)
 
 # feature engineering
-data = add_demand_features(data, DAYS_PRED)
-data = add_price_features(data)
+data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
+data = add_price_features(data).pipe(reduce_mem_usage)
 dt_col = "date"
-data = add_time_features(data, dt_col)
+data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
 data = data.sort_values("date")
 
 print("start date:", data[dt_col].min())

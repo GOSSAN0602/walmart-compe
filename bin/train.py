@@ -6,7 +6,7 @@ import gc
 import matplotlib.pyplot as plt
 import sys
 sys.path.append('./')
-from libs.data_utils import CustomTimeSeriesSplitter, make_submission
+from libs.data_utils import CustomTimeSeriesSplitter, make_submission, reduce_mem_usage
 from libs.trainer import train_lgb
 from libs.wrmsse import WRMSSEEvaluator
 

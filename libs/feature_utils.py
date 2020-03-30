@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import sys
+sys.path.append('./')
+from libs.data_utils import reduce_mem_usage
 
 def add_demand_features(df, DAYS_PRED):
     for diff in tqdm([0, 1, 2, 7, 14, 21, 28]):
