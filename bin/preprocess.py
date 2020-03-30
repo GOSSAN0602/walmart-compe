@@ -5,7 +5,7 @@ import gc
 
 import sys
 sys.path.append('./')
-from libs.data_utils import encode_categorical, extract_num, reshape_sales, merge_calendar, merge_prices
+from libs.data_utils import encode_categorical, extract_num, reshape_sales, merge_calendar, merge_prices, reduce_mem_usage
 from libs.feature_utils import add_demand_features, add_price_features, add_time_features
 
 import pandas as pd
