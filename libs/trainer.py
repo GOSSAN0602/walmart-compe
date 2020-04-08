@@ -62,7 +62,7 @@ def train_lgb(bst_params, fit_params, X, y, cv, tr_id_date, drop_when_train=None
         del idx_trn, idx_val, X_trn, X_val, y_trn, y_val, valid_preds, valid_preds_array, evaluator
         gc.collect()
 
-    #losses.loc['average','rmse']=losses['rmse'].mean()
+    losses.loc['average','rmse']=losses['rmse'].mean()
     losses.loc['average','wrmsse']=losses['wrmsse'].mean()
 
     return models, losses

@@ -6,34 +6,69 @@ sys.path.append('./')
 from libs.data_utils import reduce_mem_usage
 
 def add_demand_features(df, DAYS_PRED):
-    for diff in tqdm([0, 1, 2, 7, 14, 21, 28]):
+    import pdb;pdb.set_trace()
+    # lag feature
+    for diff in tqdm([0, 7, 14, 21, 28]):
         shift = DAYS_PRED + diff
         df[f"demand_shift_t{shift}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(shift)
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
+    # deamand basic feature
+    for window in tqdm([7, 14, 21, 28]):
         df[f"demand_rolling_std_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).std()
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
+    for window in tqdm([7, 14, 21, 28]):
         df[f"demand_rolling_mean_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
+    for window in tqdm([7, 14, 21, 28]):
         df[f"demand_rolling_median_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).median()
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
+    for window in tqdm([7, 14, 21, 28]):
         df[f"demand_rolling_max_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).max()
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
+    for window in tqdm([7, 14, 21, 28]):
         df[f"demand_rolling_min_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).min()
         )
-    for window in tqdm([7, 14, 21, 28, 60, 90, 180]):
-        df[f"demand_rolling_skew_t{window}"] = df.groupby(["id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).skew()
+    # state_id * cat_id
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_cat_demand_rolling_std_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).std()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_cat_demand_rolling_mean_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    # state_id * dept_id
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_std_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).std()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_mean_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    # store_id * cat_id
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_std_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).std()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_mean_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    # store_id * dept_id
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_std_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).std()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        df[f"state_dep_demand_rolling_mean_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
     print('demand finish')
     return df
@@ -52,21 +87,17 @@ def add_price_features(df):
     df["price_change_t365"] = (df["rolling_price_max_t365"] - df["sell_price"]) / (
         df["rolling_price_max_t365"]
     )
-    for window in tqdm([7, 30]):
+    for window in tqdm([7]):
         df[f"price_rolling_mean_t{window}"] = df.groupby(["store_id","item_id"])["sell_price"].transform(
             lambda x: x.rolling(window).mean()
         )
-    for window in tqdm([7, 30]):
+    for window in tqdm([7]):
         df[f"price_rolling_max_t{window}"] = df.groupby(["store_id","item_id"])["sell_price"].transform(
             lambda x: x.rolling(window).max()
         )
-    for window in tqdm([7, 30]):
+    for window in tqdm([7]):
         df[f"price_rolling_min_t{window}"] = df.groupby(["store_id","item_id"])["sell_price"].transform(
             lambda x: x.rolling(window).min()
-        )
-    for window in tqdm([7, 30]):
-        df[f"price_rolling_std_t{window}"] = df.groupby(["store_id","item_id"])["sell_price"].transform(
-            lambda x: x.rolling(window).std()
         )
     df['price_norm'] = df['sell_price'] / df['price_rolling_max_t7']
     df['price_nunique'] = df.groupby(['store_id','item_id'])['sell_price'].transform('nunique')
@@ -92,6 +123,7 @@ def add_time_features(df, dt_col):
         "is_month_start",
     ]
 
+    import pdb;pdb.set_trace()
     for attr in attrs:
         dtype = np.int16 if attr == "year" else np.int8
         df[attr] = getattr(df[dt_col].dt, attr).astype(dtype)
