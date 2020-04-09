@@ -123,12 +123,32 @@ def add_time_features(df, dt_col):
         "is_month_start",
     ]
 
-    import pdb;pdb.set_trace()
     for attr in attrs:
         dtype = np.int16 if attr == "year" else np.int8
         df[attr] = getattr(df[dt_col].dt, attr).astype(dtype)
 
     df["is_weekend"] = df["dayofweek"].isin([5, 6]).astype(np.int8)
-
+    import pdb;pdb.set_trace()
+    # holiday flag
+    pub_holi_list = []
+    df["public_holiday_tmp1"] = df["event_name_1"].isin(pub_holi_list)
+    df["public_holiday_tmp2"] = df["event_name_2"].isin(pub_holi_list)
+    df["public_holiday"] = 
+    # eventday flag
+    eventday_list = []
+    df["eventday_tmp1"] = df["event_name_1"].isin(eventday_list)
+    df["eventday_tmp2"] = df["event_name_2"].isin(eventday_list)
+    df["public_holiday"] = 
+    # NFL days
+    df["NFL"] = 0
+    df.loc[('2013-06-06' <= df["date"])&(df["date"] <= '2013-06-20'),"NFL"] = 1
+    df.loc[('2016-06-05' <= df["date"])&(df["date"] <= '2014-06-15'),"NFL"] = 1
+    df.loc[('2015-06-04' <= df["date"])&(df["date"] <= '2015-06-16'),"NFL"] = 1
+    # Ramadan days
+    df["Ramadan"] = 0
+    df.loc[('2013-07-09' <= df["date"])&(df["date"] <= '2013-08-08'),"Ramadan"] = 1
+    df.loc[('2014-06-29' <= df["date"])&(df["date"] <= '2014-07-29'),"Ramadan"] = 1
+    df.loc[('2015-06-18' <= df["date"])&(df["date"] <= '2015-07-18'),"Ramadan"] = 1
+    
     print('days finish')
     return df

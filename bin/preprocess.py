@@ -29,7 +29,7 @@ NUM_ITEMS = sales.shape[0]
 DAYS_PRED = submission.shape[1] - 1
 
 # Encode Categorical
-calendar = encode_categorical(calendar, ["event_name_1", "event_type_1", "event_name_2", "event_type_2"]).pipe(reduce_mem_usage)
+# calendar = encode_categorical(calendar, ["event_name_1", "event_type_1", "event_name_2", "event_type_2"]).pipe(reduce_mem_usage)
 sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "state_id"],).pipe(reduce_mem_usage)
 prices = encode_categorical(prices, ["item_id", "store_id"]).pipe(reduce_mem_usage)
 
@@ -50,8 +50,8 @@ gc.collect()
 data = reduce_mem_usage(data)
 
 # feature engineering
-data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
-data = add_price_features(data).pipe(reduce_mem_usage)
+# data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
+# data = add_price_features(data).pipe(reduce_mem_usage)
 dt_col = "date"
 data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
 data = data.sort_values("date")
