@@ -14,7 +14,7 @@ INPUT_DIR = '../input/m5-forecasting-accuracy'
 
 # READ data
 data = pd.read_hdf(f'{INPUT_DIR}/data.h5')
-
+import pdb;pdb.set_trace()
 # get CV
 day_col = "d"
 DAYS_PRED = 28
@@ -26,40 +26,90 @@ cv_params = {
     "day_col": day_col,
 }
 cv = CustomTimeSeriesSplitter(**cv_params)
-features=['item_id', 'dept_id', 'cat_id', 'store_id', 'state_id',
-       'wm_yr_wk', 'event_name_1', 'event_type_1',
-       'event_name_2', 'event_type_2', 'snap_CA', 'snap_TX', 'snap_WI',
-       'sell_price', 'demand_shift_t28', 'demand_shift_t29',
-       'demand_shift_t30', 'demand_shift_t35', 'demand_shift_t42',
-       'demand_shift_t49', 'demand_shift_t56', 'demand_rolling_std_t7',
-       'demand_rolling_std_t14', 'demand_rolling_std_t21',
-       'demand_rolling_std_t28', 'demand_rolling_std_t60',
-       'demand_rolling_std_t90', 'demand_rolling_std_t180',
-       'demand_rolling_mean_t7', 'demand_rolling_mean_t14',
-       'demand_rolling_mean_t21', 'demand_rolling_mean_t28',
-       'demand_rolling_mean_t60', 'demand_rolling_mean_t90',
-       'demand_rolling_mean_t180', 'demand_rolling_median_t7',
-       'demand_rolling_median_t14', 'demand_rolling_median_t21',
-       'demand_rolling_median_t28', 'demand_rolling_median_t60',
-       'demand_rolling_median_t90', 'demand_rolling_median_t180',
-       'demand_rolling_max_t7', 'demand_rolling_max_t14',
-       'demand_rolling_max_t21', 'demand_rolling_max_t28',
-       'demand_rolling_max_t60', 'demand_rolling_max_t90',
-       'demand_rolling_max_t180', 'demand_rolling_min_t7',
-       'demand_rolling_min_t14', 'demand_rolling_min_t21',
-       'demand_rolling_min_t28', 'demand_rolling_min_t60',
-       'demand_rolling_min_t90', 'demand_rolling_min_t180',
-       'demand_rolling_skew_t7', 'demand_rolling_skew_t14',
-       'demand_rolling_skew_t21', 'demand_rolling_skew_t28',
-       'demand_rolling_skew_t60', 'demand_rolling_skew_t90',
-       'demand_rolling_skew_t180', 'price_change_t1', 'price_change_t365',
-       'price_rolling_mean_t7', 'price_rolling_mean_t30',
-       'price_rolling_max_t7', 'price_rolling_max_t30', 'price_rolling_min_t7',
-       'price_rolling_min_t30', 'price_rolling_std_t7',
-       'price_rolling_std_t30', 'price_norm', 'price_nunique', 'year',
-       'quarter', 'month', 'week', 'day', 'dayofweek', 'is_year_end',
-       'is_year_start', 'is_quarter_end', 'is_quarter_start', 'is_month_end',
-       'is_month_start', 'is_weekend']
+features=[
+'item_id',
+'dept_id',
+'cat_id',
+'store_id',
+'state_id',
+'wm_yr_wk',
+'snap_CA',
+'snap_TX',
+'snap_WI',
+'sell_price',
+'price_change_t1',
+'price_change_t365',
+'price_rolling_mean_t7',
+'price_rolling_max_t7',
+'price_rolling_min_t7',
+'price_norm',
+'price_nunique',
+'year',
+'quarter',
+'month',
+'week',
+'day',
+'dayofweek',
+'is_year_end',
+'is_quarter_end',
+'is_quarter_start',
+'is_month_end',
+'is_month_start',
+'is_weekend',
+'public_holiday',
+'eventday',
+'NFL',
+'Ramadan',
+'demand_shift_t28',
+'demand_shift_t35',
+'demand_shift_t42',
+'demand_shift_t49',
+'demand_shift_t56',
+'demand_rolling_std_t7',
+'demand_rolling_std_t14',
+'demand_rolling_std_t21',
+'demand_rolling_std_t28',
+'demand_rolling_mean_t7',
+'demand_rolling_mean_t14',
+'demand_rolling_mean_t21',
+'demand_rolling_mean_t28',
+'demand_rolling_median_t7',
+'demand_rolling_median_t14',
+'demand_rolling_median_t21',
+'demand_rolling_median_t28',
+'demand_rolling_max_t7',
+'demand_rolling_max_t14',
+'demand_rolling_max_t21',
+'demand_rolling_max_t28',
+'demand_rolling_min_t7',
+'demand_rolling_min_t14',
+'demand_rolling_min_t21',
+'demand_rolling_min_t28',
+'id_dayofweek_demand_4times',
+'id_isweekend_demand_4times',
+'state_cat_demand_rolling_std_t7',
+'state_cat_demand_rolling_std_t14',
+'state_cat_demand_rolling_std_t21',
+'state_cat_demand_rolling_std_t28',
+'state_cat_demand_rolling_mean_t7',
+'state_cat_demand_rolling_mean_t14',
+'state_cat_demand_rolling_mean_t21',
+'state_cat_demand_rolling_mean_t28',
+'state_cat_dayofweek_demand_4times',
+'state_cat_isweekend_demand_4times',
+'state_dept_demand_rolling_std_t7',
+'state_dept_demand_rolling_std_t14',
+'state_dept_demand_rolling_std_t21',
+'state_dept_demand_rolling_std_t28',
+'state_dept_demand_rolling_mean_t7',
+'state_dept_demand_rolling_mean_t14',
+'state_dept_demand_rolling_mean_t21',
+'state_dept_demand_rolling_mean_t28',
+'state_dept_dayofweek_demand_4times',
+'state_dept_isweekend_demand_4times',
+'store_dept_dayofweek_demand_4times',
+'store_dept_isweekend_demand_4times'
+]
 
 # features = [
 #     "item_id",
@@ -158,6 +208,10 @@ for model in models:
 
 preds = preds / cv.get_n_splits()
 importances = importances / cv.get_n_splits()
+import pdb; pdb.set_trace()
+plt.figure(figsize=(32, 16))
+sns.barplot(data=importances.sort_values(by='average', ascending=False).head(50), x='average', y='feature');
+plt.title('50 TOP feature importance over {} folds average'.format(folds.n_splits))
 
 submission = pd.read_csv(f"{INPUT_DIR}/sample_submission.csv")
 make_submission(id_date.assign(demand=preds), submission)
