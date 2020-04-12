@@ -29,8 +29,7 @@ DAYS_PRED = 28
 cv_params = {
     "n_splits": 1,
     "DAYS_PRED": DAYS_PRED,
-    # "train_days": 365*2 + 185,
-    "train_days": 50,
+    "train_days": 365*2 + 185,
     "test_days": DAYS_PRED,
     "day_col": day_col,
 }
