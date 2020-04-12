@@ -116,7 +116,7 @@ class CustomTimeSeriesSplitter:
     def get_n_splits(self):
         return self.n_splits
 
-def make_submission(test, submission):
+def make_submission(test, submission, log_dir):
     DAYS_PRED=28
     preds = test[["id", "date", "demand"]]
     preds = preds.pivot(index="id", columns="date", values="demand").reset_index()
@@ -129,7 +129,7 @@ def make_submission(test, submission):
     assert final.drop("id", axis=1).isnull().sum().sum() == 0
     assert final["id"].equals(submission["id"])
 
-    final.to_csv("submission.csv", index=False)
+    final.to_csv(log_dir+"/submission.csv", index=False)
 
 def reduce_mem_usage(df, verbose=False):
     start_mem = df.memory_usage().sum() / 1024 ** 2

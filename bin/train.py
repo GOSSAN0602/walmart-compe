@@ -4,154 +4,38 @@ import tables
 import lightgbm
 import gc
 import matplotlib.pyplot as plt
+import seaborn as sns
 import sys
+import shutil
+import datetime
+import os
 sys.path.append('./')
 from libs.data_utils import CustomTimeSeriesSplitter, make_submission, reduce_mem_usage
 from libs.trainer import train_lgb
 from libs.wrmsse import WRMSSEEvaluator
+from libs.get_features import get_features
 
+log_dir = f'./log/{datetime.datetime.now()}'
+os.mkdir(log_dir)
+shutil.copyfile("./libs/get_features.py", log_dir+"/get_features.py")
 INPUT_DIR = '../input/m5-forecasting-accuracy'
 
 # READ data
 data = pd.read_hdf(f'{INPUT_DIR}/data.h5')
-import pdb;pdb.set_trace()
+
 # get CV
 day_col = "d"
 DAYS_PRED = 28
 cv_params = {
-    "n_splits": 3,
+    "n_splits": 1,
     "DAYS_PRED": DAYS_PRED,
-    "train_days": 365*2+185,
+    "train_days": 365*2 + 185,
     "test_days": DAYS_PRED,
     "day_col": day_col,
 }
 cv = CustomTimeSeriesSplitter(**cv_params)
-features=[
-'item_id',
-'dept_id',
-'cat_id',
-'store_id',
-'state_id',
-'wm_yr_wk',
-'snap_CA',
-'snap_TX',
-'snap_WI',
-'sell_price',
-'price_change_t1',
-'price_change_t365',
-'price_rolling_mean_t7',
-'price_rolling_max_t7',
-'price_rolling_min_t7',
-'price_norm',
-'price_nunique',
-'year',
-'quarter',
-'month',
-'week',
-'day',
-'dayofweek',
-'is_year_end',
-'is_quarter_end',
-'is_quarter_start',
-'is_month_end',
-'is_month_start',
-'is_weekend',
-'public_holiday',
-'eventday',
-'NFL',
-'Ramadan',
-'demand_shift_t28',
-'demand_shift_t35',
-'demand_shift_t42',
-'demand_shift_t49',
-'demand_shift_t56',
-'demand_rolling_std_t7',
-'demand_rolling_std_t14',
-'demand_rolling_std_t21',
-'demand_rolling_std_t28',
-'demand_rolling_mean_t7',
-'demand_rolling_mean_t14',
-'demand_rolling_mean_t21',
-'demand_rolling_mean_t28',
-'demand_rolling_median_t7',
-'demand_rolling_median_t14',
-'demand_rolling_median_t21',
-'demand_rolling_median_t28',
-'demand_rolling_max_t7',
-'demand_rolling_max_t14',
-'demand_rolling_max_t21',
-'demand_rolling_max_t28',
-'demand_rolling_min_t7',
-'demand_rolling_min_t14',
-'demand_rolling_min_t21',
-'demand_rolling_min_t28',
-'id_dayofweek_demand_4times',
-'id_isweekend_demand_4times',
-'state_cat_demand_rolling_std_t7',
-'state_cat_demand_rolling_std_t14',
-'state_cat_demand_rolling_std_t21',
-'state_cat_demand_rolling_std_t28',
-'state_cat_demand_rolling_mean_t7',
-'state_cat_demand_rolling_mean_t14',
-'state_cat_demand_rolling_mean_t21',
-'state_cat_demand_rolling_mean_t28',
-'state_cat_dayofweek_demand_4times',
-'state_cat_isweekend_demand_4times',
-'state_dept_demand_rolling_std_t7',
-'state_dept_demand_rolling_std_t14',
-'state_dept_demand_rolling_std_t21',
-'state_dept_demand_rolling_std_t28',
-'state_dept_demand_rolling_mean_t7',
-'state_dept_demand_rolling_mean_t14',
-'state_dept_demand_rolling_mean_t21',
-'state_dept_demand_rolling_mean_t28',
-'state_dept_dayofweek_demand_4times',
-'state_dept_isweekend_demand_4times',
-'store_dept_dayofweek_demand_4times',
-'store_dept_isweekend_demand_4times'
-]
 
-# features = [
-#     "item_id",
-#     "dept_id",
-#     "cat_id",
-#     "store_id",
-#     "state_id",
-#     "event_name_1",
-#     "event_type_1",
-#     "snap_CA",
-#     "snap_TX",
-#     "snap_WI",
-#     "sell_price",
-#     # demand features.
-#     "shift_t28",
-#     "shift_t29",
-#     "shift_t30",
-#     "rolling_std_t7",
-#     "rolling_std_t30",
-#     "rolling_std_t60",
-#     "rolling_std_t90",
-#     "rolling_std_t180",
-#     "rolling_mean_t7",
-#     "rolling_mean_t30",
-#     "rolling_mean_t60",
-#     "rolling_mean_t90",
-#     "rolling_mean_t180",
-#     "rolling_skew_t30",
-#     "rolling_kurt_t30",
-#     # price features
-#     "price_change_t1",
-#     "price_change_t365",
-#     "rolling_price_std_t7",
-#     "rolling_price_std_t30",
-#     # time features.
-#     "year",
-#     "month",
-#     "week",
-#     "day",
-#     "dayofweek",
-#     "is_weekend",
-# ]
+features=get_features()
 
 # make dataset
 is_train = data["d"] < 1914
@@ -193,27 +77,26 @@ fit_params = {
 models, losses = train_lgb(
     bst_params, fit_params, X_train, y_train, cv, tr_id_date, drop_when_train=[day_col]
 )
-
 del X_train, y_train
 gc.collect()
 
 # plot feature importance
 imp_type = "gain"
-importances = np.zeros(X_test.shape[1])
+importances = pd.DataFrame()
+importances['feature'] = X_test.columns
+importances['average'] = np.zeros(X_test.shape[1])
 preds = np.zeros(X_test.shape[0])
 
-for model in models:
+for fold_n, model in enumerate(models):
     preds += model.predict(X_test)
-    importances += model.feature_importance(imp_type)
+    importances[f'fold_{fold_n + 1}'] = model.feature_importance(imp_type)
 
 preds = preds / cv.get_n_splits()
-importances = importances / cv.get_n_splits()
-import pdb; pdb.set_trace()
+importances['average'] = importances[[f'fold_{fold_n + 1}' for fold_n in range(cv.get_n_splits())]].mean(axis=1)
 plt.figure(figsize=(32, 16))
 sns.barplot(data=importances.sort_values(by='average', ascending=False).head(50), x='average', y='feature');
-plt.title('50 TOP feature importance over {} folds average'.format(folds.n_splits))
+plt.title('50 TOP feature importance')
+plt.savefig(log_dir+"/imp.png")
 
 submission = pd.read_csv(f"{INPUT_DIR}/sample_submission.csv")
-make_submission(id_date.assign(demand=preds), submission)
-
-import pdb;pdb.set_trace()
+make_submission(id_date.assign(demand=preds), submission, log_dir)
