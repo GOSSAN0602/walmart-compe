@@ -29,7 +29,8 @@ DAYS_PRED = 28
 cv_params = {
     "n_splits": 1,
     "DAYS_PRED": DAYS_PRED,
-    "train_days": 365*2 + 185,
+    # "train_days": 365*2 + 185,
+    "train_days": 50,
     "test_days": DAYS_PRED,
     "day_col": day_col,
 }
@@ -95,8 +96,8 @@ preds = preds / cv.get_n_splits()
 importances['average'] = importances[[f'fold_{fold_n + 1}' for fold_n in range(cv.get_n_splits())]].mean(axis=1)
 plt.figure(figsize=(32, 16))
 sns.barplot(data=importances.sort_values(by='average', ascending=False).head(50), x='average', y='feature');
-plt.title('50 TOP feature importance')
-plt.savefig(log_dir+"/imp.png")
+plt.title(f"50 TOP feature importance / wrmsse:{losses.loc['average','wrmsse']}")
+plt.savefig(f"{log_dir}/{losses.loc['average','wrmsse']}.png")
 
 submission = pd.read_csv(f"{INPUT_DIR}/sample_submission.csv")
 make_submission(id_date.assign(demand=preds), submission, log_dir)
