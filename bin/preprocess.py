@@ -52,9 +52,9 @@ data = reduce_mem_usage(data)
 # feature engineering
 dt_col = "date"
 data.to_hdf(f"{INPUT_DIR}/data_backup.h5", key='df', mode='w')
-data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
 data = add_price_features(data).pipe(reduce_mem_usage)
 data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
+data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
 
 # sort "finally"
 data = data.sort_values("date")
