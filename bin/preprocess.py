@@ -50,12 +50,15 @@ gc.collect()
 data = reduce_mem_usage(data)
 
 # feature engineering
-data = add_price_features(data).pipe(reduce_mem_usage)
 dt_col = "date"
-data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
 data.to_hdf(f"{INPUT_DIR}/data_backup.h5", key='df', mode='w')
-data = data.sort_values("date")
 data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
+data = add_price_features(data).pipe(reduce_mem_usage)
+data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
+
+# sort "finally"
+data = data.sort_values("date")
+
 
 print("start date:", data[dt_col].min())
 print("end date:", data[dt_col].max())

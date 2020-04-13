@@ -161,13 +161,11 @@ def add_time_features(df, dt_col):
         "is_month_end",
         "is_month_start",
     ]
-
     for attr in attrs:
         dtype = np.int16 if attr == "year" else np.int8
         df[attr] = getattr(df[dt_col].dt, attr).astype(dtype)
-
     df["is_weekend"] = df["dayofweek"].isin([5, 6]).astype(np.int8)
-    # event_name_separate
+
     # holiday flag
     pub_holi_list = ["MemorialDay","IndependenceDay","Eid al-Fitr","LaborDay","ColumbusDay","ColumbusDay","EidAlAdha","NewYear","MartinLutherKingDay","SuperBowl","PresidentsDay","StPatricksDay"]
     df["public_holiday"] = (df["event_name_1"].isin(pub_holi_list))*1
