@@ -33,83 +33,83 @@ def add_demand_features(df, DAYS_PRED):
         df[f"demand_rolling_min_t{window}"] = df.groupby(["id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).min()
         )
-    # same dayofweek average
-    for window in tqdm([4]):
-        df[f"id_dayofweek_demand_{window}times"] = df.groupby(["id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"id_isweekend_demand_{window}times"] = df.groupby(["id","is_weekend"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    # state_id * cat_id
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_cat_demand_rolling_std_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).std()
-        )
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_cat_demand_rolling_mean_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"state_cat_dayofweek_demand_{window}times"] = df.groupby(["state_id","cat_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"state_cat_isweekend_demand_{window}times"] = df.groupby(["state_id","cat_id","is_weekend"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    # state_id * dept_id
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).std()
-        )
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"state_dept_dayofweek_demand_{window}times"] = df.groupby(["state_id","dept_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"state_dept_isweekend_demand_{window}times"] = df.groupby(["state_id","dept_id","is_weekend"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    # store_id * cat_id
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).std()
-        )
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","cat_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","cat_id","is_weekend"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    # store_id * dept_id
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).std()
-        )
-    for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","dept_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
-    for window in tqdm([4]):
-        df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","dept_id","is_weekend"])["demand"].transform(
-            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
+    # # same dayofweek average
+    # for window in tqdm([4]):
+    #     df[f"id_dayofweek_demand_{window}times"] = df.groupby(["id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"id_isweekend_demand_{window}times"] = df.groupby(["id","is_weekend"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # # state_id * cat_id
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_cat_demand_rolling_std_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).std()
+    #     )
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_cat_demand_rolling_mean_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"state_cat_dayofweek_demand_{window}times"] = df.groupby(["state_id","cat_id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"state_cat_isweekend_demand_{window}times"] = df.groupby(["state_id","cat_id","is_weekend"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # # state_id * dept_id
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).std()
+    #     )
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"state_dept_dayofweek_demand_{window}times"] = df.groupby(["state_id","dept_id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"state_dept_isweekend_demand_{window}times"] = df.groupby(["state_id","dept_id","is_weekend"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # # store_id * cat_id
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).std()
+    #     )
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","cat_id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","cat_id","is_weekend"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # # store_id * dept_id
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).std()
+    #     )
+    # for window in tqdm([7, 14, 21, 28]):
+    #     df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","dept_id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
+    # for window in tqdm([4]):
+    #     df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","dept_id","is_weekend"])["demand"].transform(
+    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+    #     )
     print('demand finish')
     return df
 
