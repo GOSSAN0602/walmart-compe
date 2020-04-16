@@ -34,7 +34,7 @@ sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "
 prices = encode_categorical(prices, ["item_id", "store_id"]).pipe(reduce_mem_usage)
 
 # merge tables
-data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 365*3)
+data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 90)
 del sales
 gc.collect()
 
