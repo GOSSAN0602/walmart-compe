@@ -45,7 +45,7 @@ def get_features():
     #'demand_rolling_mean_t7',
     #'demand_rolling_mean_t14',
     #'demand_rolling_mean_t21',
-    #'demand_rolling_mean_t28',
+    'demand_rolling_mean_t28',
     # 'demand_rolling_median_t7',
     # 'demand_rolling_median_t14',
     # 'demand_rolling_median_t21',
