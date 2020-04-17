@@ -22,7 +22,6 @@ INPUT_DIR = '../input/m5-forecasting-accuracy'
 
 # READ data
 data = pd.read_hdf(f'{INPUT_DIR}/data.h5')
-import pdb;pdb.set_trace()
 # get CV
 day_col = "d"
 DAYS_PRED = 28
