@@ -58,7 +58,7 @@ def get_features():
     'demand_rolling_min_t14',
     'demand_rolling_min_t21',
     'demand_rolling_min_t28',
-    # 'id_dayofweek_demand_4times',
+    'id_dayofweek_demand_4times',
     # 'state_cat_demand_rolling_std_t7',
     # 'state_cat_demand_rolling_std_t14',
     # 'state_cat_demand_rolling_std_t21',
@@ -80,3 +80,4 @@ def get_features():
     # 'store_dept_dayofweek_demand_4times'
     ]
     return features
+# 2~60 safe
