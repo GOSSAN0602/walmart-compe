@@ -44,23 +44,37 @@ def add_demand_features(df, DAYS_PRED):
     #     df[f"id_isweekend_demand_{window}times"] = df.groupby(["id","is_weekend"])["demand"].transform(
     #         lambda x: x.shift(DAYS_PRED/7).rolling(window).mean()
     #     )
+
     # state_id * cat_id
+    agg_df = df.groupby(["state_id", "cat_id", "d"])["demand"].mean().reset_index()
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_cat_demand_rolling_std_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+        agg_df[f"state_cate_demand_mean_window{window}"] = agg_df.groupby(["state_id", "cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        agg_df[f"state_cat_demand_rolling_std_window{window}"] = agg_df.groupby(["state_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).std()
         )
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_cat_demand_rolling_mean_t{window}"] = df.groupby(["state_id","cat_id"])["demand"].transform(
+        agg_df[f"state_cat_demand_rolling_mean_window{window}"] = agg_df.groupby(["state_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
-    for window in tqdm([4]):
-        df[f"state_cat_dayofweek_demand_{window}times"] = df.groupby(["state_id","cat_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-        )
+    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
+    del agg_df
+    gc.collect()
+
+    # state * cate * dayofweek
+    # agg_df = df.groupby(["state_id", "cat_id", "dayofweek", "d"])["demand"].mean().reset_index()
+    # for window in tqdm([4]):
+    #     agg_df[f"state_cat_dayofweek_demand_{window}times"] = agg_df.groupby(["state_id","cat_id","dayofweek"])["demand"].transform(
+    #         lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
+    #     )
+
     # for window in tqdm([4]):
     #     df[f"state_cat_isweekend_demand_{window}times"] = df.groupby(["state_id","cat_id","is_weekend"])["demand"].transform(
     #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
     #     )
+
     # state_id * dept_id
     for window in tqdm([7, 14, 21, 28]):
         df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
@@ -78,6 +92,7 @@ def add_demand_features(df, DAYS_PRED):
     #     df[f"state_dept_isweekend_demand_{window}times"] = df.groupby(["state_id","dept_id","is_weekend"])["demand"].transform(
     #         lambda x: x.shift(int(DAYS_PRED_7)).rolling(window).mean()
     #     )
+
     # store_id * cat_id
     for window in tqdm([7, 14, 21, 28]):
         df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
