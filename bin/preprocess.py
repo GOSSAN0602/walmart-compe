@@ -34,7 +34,7 @@ sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "
 prices = encode_categorical(prices, ["item_id", "store_id"]).pipe(reduce_mem_usage)
 
 # merge tables
-data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 90)
+data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 365*3)
 del sales
 gc.collect()
 
@@ -51,9 +51,9 @@ data = reduce_mem_usage(data)
 
 # feature engineering
 dt_col = "date"
-data = add_price_features(data).pipe(reduce_mem_usage)
 data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
 data = add_demand_features(data, DAYS_PRED).pipe(reduce_mem_usage)
+data = add_price_features(data).pipe(reduce_mem_usage)
 
 # sort "finally"
 data = data.sort_values("date")
