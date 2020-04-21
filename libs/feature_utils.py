@@ -35,16 +35,6 @@ def add_demand_features(df, DAYS_PRED):
             lambda x: x.shift(DAYS_PRED).rolling(window).min()
         )
 
-    # same dayofweek average
-    for window in tqdm([4]):
-        df[f"id_dayofweek_demand_{window}times"] = df.groupby(["id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-        )
-    # for window in tqdm([4]):
-    #     df[f"id_isweekend_demand_{window}times"] = df.groupby(["id","is_weekend"])["demand"].transform(
-    #         lambda x: x.shift(DAYS_PRED/7).rolling(window).mean()
-    #     )
-
     # state_id * cat_id
     agg_df = df.groupby(["state_id", "cat_id", "d"])["demand"].mean().reset_index()
     for window in tqdm([7, 14, 21, 28]):
@@ -59,74 +49,118 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"state_cat_demand_rolling_mean_window{window}"] = agg_df.groupby(["state_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
+    """
+    shiftの名前を組み合わせで変える！！！！！
+    """
     df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
     del agg_df
     gc.collect()
-
-    # state * cate * dayofweek
-    # agg_df = df.groupby(["state_id", "cat_id", "dayofweek", "d"])["demand"].mean().reset_index()
-    # for window in tqdm([4]):
-    #     agg_df[f"state_cat_dayofweek_demand_{window}times"] = agg_df.groupby(["state_id","cat_id","dayofweek"])["demand"].transform(
-    #         lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-    #     )
-
-    # for window in tqdm([4]):
-    #     df[f"state_cat_isweekend_demand_{window}times"] = df.groupby(["state_id","cat_id","is_weekend"])["demand"].transform(
-    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-    #     )
+    ## state * cate * dayofweek
+    agg_list = []
+    for diff in tqdm([28, 35, 42, 49, 56]):
+        agg_list.append(data.groupby(["state_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+    agg_df = agg_list[0]
+    for i in range(len(agg_list )-1):
+        agg_df = agg_df.merge(agg_list[i +1], on=["state_id","cat_id","d"], how="left")
+    for i in range(4):
+        agg_df[f"state_cat_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
+    agg_df["state_cat_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
+    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
+    del agg_df, agg_list
+    gc.collect()
 
     # state_id * dept_id
+    agg_df = df.groupby(["state_id", "dept_id", "d"])["demand"].mean().reset_index()
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+        agg_df[f"state_dept_demand_mean_window{window}"] = agg_df.groupby(["state_id", "dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        agg_df[f"state_dept_demand_rolling_std_window{window}"] = agg_df.groupby(["state_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).std()
         )
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["state_id","dept_id"])["demand"].transform(
+        agg_df[f"state_dept_demand_rolling_mean_window{window}"] = agg_df.groupby(["state_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
-    for window in tqdm([4]):
-        df[f"state_dept_dayofweek_demand_{window}times"] = df.groupby(["state_id","dept_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-        )
-    # for window in tqdm([4]):
-    #     df[f"state_dept_isweekend_demand_{window}times"] = df.groupby(["state_id","dept_id","is_weekend"])["demand"].transform(
-    #         lambda x: x.shift(int(DAYS_PRED_7)).rolling(window).mean()
-    #     )
+    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left")
+    del agg_df
+    gc.collect()
+    ## state * dept * dayofweek
+    agg_list = []
+    for diff in tqdm([28, 35, 42, 49, 56]):
+        agg_list.append(data.groupby(["state_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+    agg_df = agg_list[0]
+    for i in range(len(agg_list )-1):
+        agg_df = agg_df.merge(agg_list[i +1], on=["state_id","dept_id","d"], how="left")
+    for i in range(4):
+        agg_df[f"state_dept_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
+    agg_df["state_dept_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
+    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left")
+    del agg_df, agg_list
+    gc.collect()
 
     # store_id * cat_id
+    agg_df = df.groupby(["store_id", "cat_id", "d"])["demand"].mean().reset_index()
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+        agg_df[f"store_cat_demand_mean_window{window}"] = agg_df.groupby(["store_id", "cat_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        agg_df[f"store_cat_demand_rolling_std_window{window}"] = agg_df.groupby(["store_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).std()
         )
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","cat_id"])["demand"].transform(
+        agg_df[f"store_cat_demand_rolling_mean_window{window}"] = agg_df.groupby(["store_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
-    for window in tqdm([4]):
-        df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","cat_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-        )
-    # for window in tqdm([4]):
-    #     df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","cat_id","is_weekend"])["demand"].transform(
-    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-    #     )
+    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left")
+    del agg_df
+    gc.collect()
+    ## store * cat * dayofweek
+    agg_list = []
+    for diff in tqdm([28, 35, 42, 49, 56]):
+        agg_list.append(data.groupby(["store_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+    agg_df = agg_list[0]
+    for i in range(len(agg_list )-1):
+        agg_df = agg_df.merge(agg_list[i +1], on=["store_id","cat_id","d"], how="left")
+    for i in range(4):
+        agg_df[f"store_cat_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
+    agg_df["store_cat_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
+    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left")
+    del agg_df, agg_list
+    gc.collect()
+
     # store_id * dept_id
+    agg_df = df.groupby(["store_id", "dept_id", "d"])["demand"].mean().reset_index()
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_std_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+        agg_df[f"store_dept_demand_mean_window{window}"] = agg_df.groupby(["store_id", "dept_id"])["demand"].transform(
+            lambda x: x.shift(DAYS_PRED).rolling(window).mean()
+        )
+    for window in tqdm([7, 14, 21, 28]):
+        agg_df[f"store_dept_demand_rolling_std_window{window}"] = agg_df.groupby(["store_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).std()
         )
     for window in tqdm([7, 14, 21, 28]):
-        df[f"state_dept_demand_rolling_mean_t{window}"] = df.groupby(["store_id","dept_id"])["demand"].transform(
+        agg_df[f"store_dept_demand_rolling_mean_window{window}"] = agg_df.groupby(["store_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
-    for window in tqdm([4]):
-        df[f"store_dept_dayofweek_demand_{window}times"] = df.groupby(["store_id","dept_id","dayofweek"])["demand"].transform(
-            lambda x: x.shift(int(DAYS_PRED/7)).rolling(window).mean()
-        )
-    # for window in tqdm([4]):
-    #     df[f"store_dept_isweekend_demand_{window}times"] = df.groupby(["store_id","dept_id","is_weekend"])["demand"].transform(
-    #         lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-    #     )
+    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left")
+    del agg_df
+    gc.collect()
+    ## store * dept * dayofweek
+    agg_list = []
+    for diff in tqdm([28, 35, 42, 49, 56]):
+        agg_list.append(data.groupby(["store_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+    agg_df = agg_list[0]
+    for i in range(len(agg_list )-1):
+        agg_df = agg_df.merge(agg_list[i +1], on=["store_id","dept_id","d"], how="left")
+    for i in range(4):
+        agg_df[f"store_dept_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
+    agg_df["store_dept_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
+    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left")
+    del agg_df, agg_list
+    gc.collect()
     print('demand finish')
     return df
 
