@@ -51,7 +51,7 @@ def add_demand_features(df, DAYS_PRED):
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
     agg_df = agg_df.drop(["demand"],axis=1)
-    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
+    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df
     gc.collect()
     ## state * cate * dayofweek
@@ -66,7 +66,7 @@ def add_demand_features(df, DAYS_PRED):
     agg_df["state_cat_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
     drop_list = ["demand_shift_t28","demand_shift_t35","demand_shift_t42","demand_shift_t49","demand_shift_t56"]
     agg_df = agg_df.drop(drop_list,axis=1)
-    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
+    df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df, agg_list
     gc.collect()
 
@@ -85,7 +85,7 @@ def add_demand_features(df, DAYS_PRED):
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
             )
     agg_df = agg_df.drop(["demand"],axis=1)
-    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left")
+    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df
     gc.collect()
     ## state * dept * dayofweek
@@ -99,7 +99,7 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"state_dept_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
     agg_df["state_dept_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
     agg_df = agg_df.drop(drop_list,axis=1)
-    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left")
+    df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df, agg_list
     gc.collect()
 
@@ -118,7 +118,7 @@ def add_demand_features(df, DAYS_PRED):
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
     agg_df = agg_df.drop(["demand"],axis=1)
-    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left")
+    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df
     gc.collect()
     ## store * cat * dayofweek
@@ -132,7 +132,7 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"store_cat_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
     agg_df["store_cat_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
     agg_df = agg_df.drop(drop_list,axis=1)
-    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left")
+    df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df, agg_list
     gc.collect()
 
@@ -151,7 +151,7 @@ def add_demand_features(df, DAYS_PRED):
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
     agg_df = agg_df.drop(["demand"],axis=1)
-    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left")
+    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df
     gc.collect()
     ## store * dept * dayofweek
@@ -165,7 +165,7 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"store_dept_t{28+i*7}/t{35+i*7}"] = agg_df[f"demand_shift_t{28+i*7}"]/agg_df[f"demand_shift_t{35+i*7}"]
     agg_df["store_dept_same_dayofweek_4times_mean"] = (agg_df["demand_shift_t28"]+agg_df["demand_shift_t28"]+agg_df["demand_shift_t35"]+agg_df["demand_shift_t42"]) / 4
     agg_df = agg_df.drop(drop_list,axis=1)
-    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left")
+    df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left").pipe(reduce_mem_usage)
     del agg_df, agg_list
     gc.collect()
     print('demand finish')
