@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import gc
 import sys
 sys.path.append('./')
 from libs.data_utils import reduce_mem_usage
@@ -49,13 +50,14 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"state_cat_demand_rolling_mean_window{window}"] = agg_df.groupby(["state_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
+    agg_df = agg_df.drop(["demand"],axis=1)
     df = df.merge(agg_df, on=["cat_id","state_id","d"], how="left")
     del agg_df
     gc.collect()
     ## state * cate * dayofweek
     agg_list = []
     for diff in tqdm([28, 35, 42, 49, 56]):
-        agg_list.append(data.groupby(["state_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+        agg_list.append(df.groupby(["state_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
     agg_df = agg_list[0]
     for i in range(len(agg_list )-1):
         agg_df = agg_df.merge(agg_list[i +1], on=["state_id","cat_id","d"], how="left")
@@ -81,14 +83,15 @@ def add_demand_features(df, DAYS_PRED):
     for window in tqdm([7, 14, 21, 28]):
         agg_df[f"state_dept_demand_rolling_mean_window{window}"] = agg_df.groupby(["state_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
-        )
+            )
+    agg_df = agg_df.drop(["demand"],axis=1)
     df = df.merge(agg_df, on=["dept_id","state_id","d"], how="left")
     del agg_df
     gc.collect()
     ## state * dept * dayofweek
     agg_list = []
     for diff in tqdm([28, 35, 42, 49, 56]):
-        agg_list.append(data.groupby(["state_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+        agg_list.append(df.groupby(["state_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
     agg_df = agg_list[0]
     for i in range(len(agg_list )-1):
         agg_df = agg_df.merge(agg_list[i +1], on=["state_id","dept_id","d"], how="left")
@@ -114,13 +117,14 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"store_cat_demand_rolling_mean_window{window}"] = agg_df.groupby(["store_id","cat_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
+    agg_df = agg_df.drop(["demand"],axis=1)
     df = df.merge(agg_df, on=["cat_id","store_id","d"], how="left")
     del agg_df
     gc.collect()
     ## store * cat * dayofweek
     agg_list = []
     for diff in tqdm([28, 35, 42, 49, 56]):
-        agg_list.append(data.groupby(["store_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+        agg_list.append(df.groupby(["store_id", "cat_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
     agg_df = agg_list[0]
     for i in range(len(agg_list )-1):
         agg_df = agg_df.merge(agg_list[i +1], on=["store_id","cat_id","d"], how="left")
@@ -146,13 +150,14 @@ def add_demand_features(df, DAYS_PRED):
         agg_df[f"store_dept_demand_rolling_mean_window{window}"] = agg_df.groupby(["store_id","dept_id"])["demand"].transform(
             lambda x: x.shift(DAYS_PRED).rolling(window).mean()
         )
+    agg_df = agg_df.drop(["demand"],axis=1)
     df = df.merge(agg_df, on=["dept_id","store_id","d"], how="left")
     del agg_df
     gc.collect()
     ## store * dept * dayofweek
     agg_list = []
     for diff in tqdm([28, 35, 42, 49, 56]):
-        agg_list.append(data.groupby(["store_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
+        agg_list.append(df.groupby(["store_id", "dept_id","d"])[f"demand_shift_t{diff}"].mean().reset_index())
     agg_df = agg_list[0]
     for i in range(len(agg_list )-1):
         agg_df = agg_df.merge(agg_list[i +1], on=["store_id","dept_id","d"], how="left")

@@ -35,7 +35,6 @@ cv_params = {
 cv = CustomTimeSeriesSplitter(**cv_params)
 
 features=get_features()
-
 # make dataset
 is_train = data["d"] < 1914
 
