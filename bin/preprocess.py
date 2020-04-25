@@ -34,7 +34,7 @@ sales = encode_categorical(sales, ["item_id", "dept_id", "cat_id", "store_id", "
 prices = encode_categorical(prices, ["item_id", "store_id"]).pipe(reduce_mem_usage)
 
 # merge tables
-data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 50)
+data = reshape_sales(sales, submission, DAYS_PRED, d_thresh=1941 - 365*3)
 del sales
 gc.collect()
 
@@ -48,7 +48,7 @@ del prices
 gc.collect()
 
 data = reduce_mem_usage(data)
-data=data.sample(frac=0.2)
+#data=data.sample(frac=0.2)
 # feature engineering
 dt_col = "date"
 data = add_time_features(data, dt_col).pipe(reduce_mem_usage)
@@ -61,6 +61,5 @@ data = data.sort_values("date")
 print("start date:", data[dt_col].min())
 print("end date:", data[dt_col].max())
 print("data shape:", data.shape)
-import pdb; pdb.set_trace()
 # save data
 data.to_hdf(f"{INPUT_DIR}/data.h5", key='df', mode='w')
