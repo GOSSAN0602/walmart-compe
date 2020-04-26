@@ -59,10 +59,10 @@ def train_lgb(bst_params, fit_params, X, y, cv, tr_id_date, drop_when_train=None
         evaluator = WRMSSEEvaluator(tr_fold_df, va_fold_df, calendar, prices)
         losses.loc[f"fold_{idx_fold}",'wrmsse'] = evaluator.score(valid_preds)
 
-        del idx_trn, idx_val, X_trn, X_val, y_trn, y_val, valid_preds, valid_preds_array, evaluator
+        del idx_trn, idx_val, X_trn, X_val, y_trn, y_val, valid_preds_array, evaluator
         gc.collect()
 
     losses.loc['average','rmse']=losses['rmse'].mean()
     losses.loc['average','wrmsse']=losses['wrmsse'].mean()
 
-    return models, losses
+    return models, valid_preds, losses
