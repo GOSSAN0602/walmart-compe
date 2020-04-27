@@ -54,15 +54,17 @@ print("X_test shape:", X_test.shape)
 
 # train config
 bst_params = {
+    "max_depth": "10",
+    "num_leaves": "128",
     "boosting_type": "gbdt",
     "metric": "rmse",
     "objective": "regression",
     "n_jobs": -1,
     "seed": 42,
     "learning_rate": 0.05,
-    "bagging_fraction": 0.75,
+    "bagging_fraction": 1.0,
     "bagging_freq": 10,
-    "colsample_bytree": 0.75,
+    "colsample_bytree": 1.0,
 }
 
 fit_params = {
