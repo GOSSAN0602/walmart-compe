@@ -76,7 +76,7 @@ models, valid_preds, losses = train_lgb(
     bst_params, fit_params, X_train, y_train, cv, tr_id_date, drop_when_train=[day_col]
 )
 valid_preds.to_csv(f"{log_dir}/{losses.loc['average','wrmsse']}.csv",index=False)
-del X_train, y_train
+del X_train, y_train, valid_preds
 gc.collect()
 
 # plot feature importance
